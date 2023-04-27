@@ -1,6 +1,7 @@
 
 require('colors');
 
+const { guardarDB, leerDB} = require('./helpers/guardarArchivo');
 const {
     inquirerMenu,
     pausa,
@@ -8,12 +9,19 @@ const {
 } = require('./helpers/inquirer');
 const Tareas = require('./models/tareas');
 
-const main =  async  () => {
 
-inquirerMenu();
+
+
+const main =  async  () => {
 
 let opt = '';
 const tareas = new Tareas();
+
+const tareasDB = leerDB();
+
+if(tareasDB){
+       tareas.cargarTareasFromArray(tareasDB);
+}
 
 do {
     //Imprimir el menu
@@ -28,9 +36,17 @@ do {
             break;
 
             case '2':
-                console.log(tareas.listadoArr);
-                break;
+                tareas.listadoCompleto();
+            break;
+            case '3':
+                tareas.listarPendientesCompletadas(true);
+            break;
+            case '4':
+                tareas.listarPendientesCompletadas(false);
+            break;
         }
+
+         guardarDB(tareas.listadoArr);
 
     //para opciones controladas con un switch
    
@@ -38,11 +54,11 @@ do {
    
 
     await pausa();
-
+     inquirerMenu();
 
 } while(opt !== '0');
 
-//  pausa();
+   pausa();
 
 }
  main();
